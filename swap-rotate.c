@@ -3,83 +3,89 @@
 /*functions related to swapping and rotating elements*/
 
 /**
- * swap - swap the values of the top and last elements
- * @h: head of the dll
- * @l: line number
- * opcode: swap
+ * _swap - function that swaps the top two elements of the stack.
+ * @stack: double pointer to the head of stack.
+ * @line_number: script line number.
+ *
+ * Usage: swap .
+ * If the stack contains less than two elements, print the error message,
+ * L<line_number>: can't swap, stack too short, followed by a new line,
+ * and exit with the status EXIT_FAILURE .
+ *
+ * Return: No return.
  */
-void swap(stack_t **h, unsigned int l)
+void _swap(stack_t **stack, unsigned int line_number)
 {
-    int value0;
+	stack_t *temp_variable;
 
-    if (!h || !*h)
-    {
-        printf("L%d: can't swap, %s too short\n", l, flag);
-        free_stack(*h);
-        exit(EXIT_FAILURE);
-    }
+	(void)(line_number);
+	if (!(*stack) || !((*stack)->next))
+	{
+		fprintf(stderr, "L%u: can't swap, stack too short\n", line_number);
+		exit(EXIT_FAILURE);
+	}
 
-    value0 = (*h)->n;
-
-    if ((*h)->next == NULL)
-    {
-        printf("L%d: can't swap, %s too short\n", l, flag);
-        free_stack(*h);
-        exit(EXIT_FAILURE);
-    }
-
-    (*h)->n = ((*h)->next)->n;
-    ((*h)->next)->n = value0;
+	temp_variable = (*stack)->next;
+	(*stack)->prev = (*stack)->next;
+	(*stack)->next = temp_variable->next;
+	temp_variable->prev = NULL;
+	(*stack)->prev = temp_variable;
+	if (temp_variable->next)
+		temp_variable->next->prev = *stack;
+	temp_variable->next = *stack;
+	(*stack) = (*stack)->prev;
 }
 
 /**
- * rotl - the top element of the stack moves to the back
- * @h: head of the dll
- * @l: line number
- * opcode: rotl
+ * _rotl - function that rotates the stack to the top.
+ * @stack: double pointer to the head of stack
+ * @line_number: script line number.
+ *
+ * The top element of the stack becomes the last one, and the second top,
+ * element of the stack becomes the first one.
+ * rotl never fails.
+ *
+ * Return: No return.
  */
-void rotl(stack_t **h, unsigned int l)
+void _rotl(stack_t **stack, unsigned int line_number)
 {
-    stack_t *node, *tmp;
+	stack_t *temp_variable = *stack, *new_top;
 
-    (void)l;
-
-    if (!h || !*h)
-        return;
-    if (!(*h)->next)
-        return; /*one element in the stack*/
-
-    node = pop_s(h);
-    node->next = NULL;
-
-    tmp = *h;
-    while (tmp->next)
-        tmp = tmp->next;
-    tmp->next = node;
-    node->prev = tmp;
+	(void)(line_number);
+	if (*stack == NULL || (*stack)->next == NULL)
+		return;
+	new_top = (*stack)->next;
+	new_top->prev = NULL;
+	while (temp_variable->next != NULL)
+		temp_variable = temp_variable->next;
+	temp_variable->next = *stack;
+	(*stack)->next = NULL;
+	(*stack)->prev = temp_variable;
+	(*stack) = new_top;
 }
 
 /**
- * rotr - the last element of the stack moves on top
- * @h: pointer to dll
- * @l: line number
- * opcode: rotr
+ * _rotr - function that rotates the stack to the bottom.
+ * @stack: double pointer to the head of stack
+ * @line_number: script line number.
+ *
+ * The last element of the stack becomes the first one.
+ * rotl never fails.
+ *
+ * Return: No return.
  */
-void rotr(stack_t **h, unsigned int l)
+void _rotr(stack_t **stack, unsigned int line_number)
 {
-    stack_t *node;
+	stack_t *temp_variable = *stack;
 
-    (void)l;
-
-    if (!h || !*h)
-        return;
-    if (!(*h)->next)
-        return; /*one element in the stack*/
-
-    node = dequeue(h);
-    node->prev = NULL;
-
-    node->next = *h;
-    (*h)->prev = node;
-    *h = node;
+	(void)(line_number);
+	if (*stack == NULL || (*stack)->next == NULL)
+		return;
+	while (temp_variable->next != NULL)
+		temp_variable = temp_variable->next;
+	temp_variable->next = *stack;
+	temp_variable->prev->next = NULL;
+	temp_variable->prev = NULL;
+	(*stack)->prev = temp_variable;
+	(*stack) = temp_variable;
 }

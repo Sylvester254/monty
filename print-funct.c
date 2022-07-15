@@ -1,95 +1,111 @@
 #include "monty.h"
 
-/* these functions are used to print all or an element of the linked list.
- * they correspond to the opcode in the description
- */
-
 /**
- * pall - print all the elements in a dll as numbers
- * @head: pointer to dll
-`* @l: line number
- * opcode: pall
+ * _pall - Prints stack.
+ * @stack: double pointer to the head of stack
+ * @line_number: script line number.
+ *
+ * Return: No return.
  */
-void pall(stack_t **head, unsigned int l)
-{
-    stack_t *h;
-    (void)l;
 
-    if (!head)
-        return;
-    h = *head;
-    while (h != NULL)
-    {
-        printf("%d\n", h->n);
-        h = h->next;
-    }
+void _pall(stack_t **stack, unsigned int line_number)
+{
+stack_t *element = *stack;
+
+(void)(line_number);
+while (element != NULL)
+{
+printf("%d\n", element->n);
+element = element->next;
+}
 }
 
 /**
- * pstr - print all the elements in a dll as chars
- * @head: pointer to dll
- * @l: line number
- * opcode: pstr
+ * _pstr - function that prints the string starting at top of the stack.
+ * @stack: double pointer to the head of stack
+ * @line_number: script line number.
+ *
+ * The integer stored at the top of the stack is treated as the ascii,
+ * value of the character to be printed.
+ * The string stops when either: the stack is over, the value of the,
+ * element is 0 or the value of the element is not in the ascii table.
+ * If the stack is empty, print only a new line.
+ *
+ * Return: No return.
  */
-void pstr(stack_t **head, unsigned int l)
+void _pstr(stack_t **stack, unsigned int line_number)
 {
-    stack_t *h;
-    (void)l;
+	stack_t *temp_variable = *stack;
 
-    if (!head || !*head)
-        puts("");
-
-    h = *head;
-    while (h != NULL && h->n > 0 && h->n < 127)
-    {
-        printf("%c\n", h->n);
-        h = h->next;
-    }
+	(void)(line_number);
+	if (!(*stack))
+	{
+		printf("\n");
+		return;
+	}
+	while (temp_variable)
+	{
+		if (isascii(temp_variable->n) && temp_variable->n != 0)
+			putchar(temp_variable->n);
+		else
+			break;
+		temp_variable = temp_variable->next;
+	}
+	putchar('\n');
 }
 
 /**
- * pint - pick the top of the stack
- * @h: pointer to dll
- * @l: line number
- * opcode: pchar
+ * _pint - function that prints the value at the top of the stack.
+ * @stack: double pointer to the head of stack.
+ * @line_number: script line number.
+ *
+ * Usage: pint .
+ * If the stack is empty, print the error message,
+ * L<line_number>: can't pint, stack empty, followed by a new line,
+ * and exit with the status EXIT_FAILURE.
+ *
+ * Return: No return.
  */
-void pint(stack_t **h, unsigned int l)
+void _pint(stack_t **stack, unsigned int line_number)
 {
-
-    if (!h || !*h)
-    {
-        printf("L%d: can't pint, %s empty\n", l, flag);
-        free_stack(*h);
-        exit(EXIT_FAILURE);
-    }
-
-    printf("%d\n", (*h)->n);
+	if (stack == NULL || *stack == NULL)
+	{
+		fprintf(stderr, "L%u: can't pint, stack empty\n", line_number);
+		exit(EXIT_FAILURE);
+	}
+	printf("%d\n", (*stack)->n);
 }
 
 /**
- * pchar - pick the top of the stack
- * @h: pointer to dll
- * @l: line number
- * opcode: pchar
+ * _pchar - function that prints the char at the top of the stack.
+ * @stack: double pointer to the head of stack
+ * @line_number: script line number.
+ *
+ * The integer stored at the top of the stack is treated as the ascii,
+ * value of the character to be printed.
+ * If the value is not in the ascii table (man ascii) print the error,
+ * message L<line_number>: can't pchar, value out of range, followed by,
+ * a new line, and exit with the status EXIT_FAILURE.
+ * If the stack is empty, print the error message:
+ * L<line_number>: can't pchar, stack empty, followed by a new line, and,
+ * exit with the status EXIT_FAILURE .
+ *
+ * Return: No return.
  */
-void pchar(stack_t **h, unsigned int l)
+void _pchar(stack_t **stack, unsigned int line_number)
 {
-    int value;
+	int ch;
 
-    if (!h || !*h)
-    {
-        printf("L%d: can't pchar, %s empty\n", l, flag);
-        free_stack(*h);
-        exit(EXIT_FAILURE);
-    }
-
-    value = (*h)->n;
-    if (value < 0 || value > 127)
-    {
-        printf("L%d: can't pchar, value out of range\n", l);
-        free_stack(*h);
-        exit(EXIT_FAILURE);
-    }
-    else
-        printf("%c\n", value);
+	if (!(*stack))
+	{
+		fprintf(stderr, "L%u: can't pchar, stack empty\n", line_number);
+		exit(EXIT_FAILURE);
+	}
+	ch = (*stack)->n;
+	if (!isascii(ch))
+	{
+		fprintf(stderr, "L%u: can't pchar, value out of range\n", line_number);
+		exit(EXIT_FAILURE);
+	}
+	printf("%c\n", ch);
 }
